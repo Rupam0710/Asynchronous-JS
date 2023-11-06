@@ -1,16 +1,3 @@
-//normal function - call back
-
-// function a(call_b) {
-//   call_b();
-//   console.log("step1");
-// }
-
-// function b() {
-//   console.log("step2");
-// }
-
-// a(b);
-
 //object
 let stocks = {
   Fruits: ["strawbeery", "grapes", "mango", "banana"],
@@ -19,42 +6,53 @@ let stocks = {
   toppings: ["chocolate", "peanuts"],
 };
 
-//arrow function call back
-let order = (Fruit_name, call_production) => {
-  setTimeout(() => {
-    console.log(`${stocks.Fruits[Fruit_name]} was selected`);
-    call_production();
-  }, 2000);
-};
+//promises
 
-let production = () => {
-  setTimeout(() => {
-    console.log(`Production has started`);
+let is_shop_open = true;
 
-    setTimeout(() => {
-      console.log("The fruit has been chopped");
-
+let order = (time, work) => {
+  return new Promise((resolve, reject) => {
+    if (is_shop_open) {
       setTimeout(() => {
-        console.log(`${stocks.liquid[0]} and ${stocks.liquid[1]} was added`);
-
-        setTimeout(() => {
-          console.log("The machine has been started");
-
-          setTimeout(() => {
-            console.log(`Ice cream was placed on the ${stocks.holder[0]}`);
-
-            setTimeout(() => {
-              console.log(`${stocks.toppings[1]} was added as toppings`);
-
-              setTimeout(() => {
-                console.log("Serve Ice cream");
-              }, 2000);
-            }, 3000);
-          }, 2000);
-        }, 1000);
-      }, 1000);
-    }, 2000);
-  }, 0);
+        resolve(work());
+      }, time);
+    } else {
+      reject(console.log("Our shop is closed"));
+    }
+  });
 };
 
-order(0, production);
+order(2000, () => {
+  console.log(`${stocks.Fruits[0]} was selected`);
+})
+  .then(() => {
+    return order(0, () => console.log("Production has started"));
+  })
+  .then(() => {
+    return order(2000, () => console.log("The fruit was chopped"));
+  })
+  .then(() => {
+    return order(1000, () =>
+      console.log(`${stocks.liquid[0]} and ${stocks.liquid[1]} was selected`)
+    );
+  })
+  .then(() => {
+    return order(1000, () => console.log("Start the machine"));
+  })
+  .then(() => {
+    return order(2000, () =>
+      console.log(`Ice cream was placed on ${stocks.holder[0]}`)
+    );
+  })
+  .then(() => {
+    return order(3000, () => console.log(`${stocks.toppings[0]} was selected`));
+  })
+  .then(() => {
+    return order(2000, () => console.log(`Ice cream was served`));
+  })
+  .catch(() => {
+    console.log("Customer left");
+  })
+  .finally(() => {
+    console.log("Day ended, Shop is closed!!");
+  });
